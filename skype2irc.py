@@ -33,23 +33,23 @@ from ircbot import SingleServerIRCBot
 from irclib import ServerNotConnectedError
 from threading import Timer
 
-version = "0.2"
+version = "0.22"
 
 servers = [
-("irc.freenode.net", 6667),
-("hitchcock.freenode.net", 6667),
-("leguin.freenode.net", 6667),
-("verne.freenode.net", 6667),
-("roddenberry.freenode.net", 6667),
+("irc.someserver.net", 6667),
 ]
 
-nick = "skype-}"
-botname = "IRC ⟷  Skype".decode('UTF-8')
+nick = "GumBot"
+botname = "IRC ⟷  Skype Bot, codename GumBot".decode('UTF-8')
 password = None
 
 mirrors = {
-'#test':
-'X0_uprrk9XD40sCzSx_QtLT-oELEiV63Jw402jjG0dUaHiq2CD-F-6gKEQiFrgF_YPiUBcH-d6JcgmyWRPnteETG',
+'#pfc':
+'zx3SYBCX3Z3baXam0vsl9YDK8lYwBHNg9BtNoKW0GiILYibzfakNbW7hhbKyuwZtvFAKQbtrdp1YyXHmW-D0fm_4kw98nHW9Hu_r5h38R8JLLq_DrbT0W5O5d3Uf9nQlv0OLqlcPYpMzfc0Z7xDoUoE1yNCzFtDunqkbzOX0mGY-4ja9Cx_QXSgQGcYuhEw6cERQWyIVwQyjJ9fEg2s',
+'#drawncon-staff':
+'ySZLaBWTR_GxJ17cQAzOC7xZNVpedV09ycTm4jERs9GcZbL6MOPqqITnVUfdxRwEm2AykF86dRFwQS72KyKJdPmNDWf684Z0mYslSTYyH1DK-QwiI_5oTzA_ez1gmEpLHIZ0cFyx25DjnVhyvl1jDN2W1SGPrpIrAEHKXETKMhK__P2mrndwBaKC0lSp4Fbic74KdKVO5Z0Qezk0e56dDw',
+'#funderdome':
+'Yddl89U8KYP2qcW8pY6jKy13yOwloLEJlmXcLKKV9DHS6Vj2ITE_UV74aLFAwL1DFu160YGZCpxHYur6yi76UHYLHEmNT5T_iL8GBzMAAxGBu9oiAlbr_LLwn0QNjwSYekb6hab3Jf0iZ4hw_fLoj9O_zVafZOP1N8zHuSpg6Bs',
 }
 
 max_irc_msg_len = 442
@@ -63,9 +63,9 @@ delay_btw_seqs = 0.15
 
 preferred_encodings = ["UTF-8", "CP1252", "ISO-8859-1"]
 
-name_start = "◀".decode('UTF-8') # "<"
-name_end = "▶".decode('UTF-8') # ">"
-emote_char = "✱".decode('UTF-8') # "*"
+name_start = "<".decode('UTF-8') # "<"
+name_end = ">".decode('UTF-8') # ">"
+emote_char = "*".decode('UTF-8') # "*"
 
 muted_list_filename = nick + '.%s.muted'
 
@@ -281,7 +281,8 @@ class MirrorBot(SingleServerIRCBot):
         print "Connected to", self.connection.get_server_name()
         if password is not None:
             bot.say("NickServ", "identify " + password)
-        self.connection.add_global_handler("ctcp", self.handle_ctcp)
+        time.sleep(1)
+	self.connection.add_global_handler("ctcp", self.handle_ctcp)
         for pair in mirrors:
             connection.join(pair)
             print "Joined " + pair
@@ -291,7 +292,7 @@ class MirrorBot(SingleServerIRCBot):
         """React to channel messages"""
         args = event.arguments()
         source = event.source().split('!')[0]
-        target = event.target()
+        target = event.target().lower()
         cmds = args[0].split()
         if cmds[0].rstrip(":,") == nick:
             if len(cmds)==2:
@@ -315,7 +316,7 @@ class MirrorBot(SingleServerIRCBot):
         """Handle CTCP events for emoting"""
         args = event.arguments()
         source = event.source().split('!')[0]
-        target = event.target()
+        target = event.target().lower()
         if target in mirrors.keys():
             if source in mutedl[target]:
                 return
