@@ -3,6 +3,7 @@
 	"nick": "GumBot",
 	"botname": "IRC <-> Skype Bot",
 	"password": "",
+	"vhost": false,
 	"mirrors": {
 		"#channel1": "blob"
 	}

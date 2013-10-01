@@ -46,6 +46,7 @@ servers = config['servers']
 nick = config['nick']
 botname = config['botname'].decode("UTF-8")
 password = config['password']
+vhost = config['vhost']
 
 # {'#bronycon-registration': "skype:?chat&blob=DtK3LJ0-oziuQwXQaRQkMVAX2iNryb1VWY7kZAKjAOHRUgR_uFE3GEIncztciVRYGVRXEnEpGtqiS35jsld-cswmTP_RXyPEnsU0XLjwMLOKwcFjTJ1RNMcduvhlnFRlvUMZzr1HVH9gw45lfN0omAsoNOfwnvkgOIc1Ilh8Pcc6vc9TPrLy-QwAFvqdrNHqW6tpInYUpOMxaAS55L-JfKuOGbKbps3HVGU5MKBPFSIM"}
 mirrors = config['mirrors']
@@ -279,6 +280,8 @@ class MirrorBot(SingleServerIRCBot):
         print "Connected to", self.connection.get_server_name()
         if password is not None:
             bot.say("NickServ", "identify " + password)
+	if vhost:
+	    bot.say("HostServ", "ON")
         time.sleep(1)
 	self.connection.add_global_handler("ctcp", self.handle_ctcp)
         for pair in mirrors:
