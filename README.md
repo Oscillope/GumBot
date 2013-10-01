@@ -24,13 +24,13 @@ For `python-skype` I used the version 1.0.31.0 provided at `ppa:skype-wrapper/pp
 CONFIGURE
 ---------
 
-You can configure the IRC servers and Skype chatrooms to mirror in the header of `skype2irc.py`. You may define one IRC server and as many pairs of IRC channels and Skype chatrooms as you like. Skype chatrooms are defined by the blob, which you can obtain writing `/get uri` in a chatroom.
+You can configure the IRC servers and Skype chatrooms to mirror in the configuration file `config.json`. You may define one IRC network (optionally with multiple servers) and as many pairs of IRC channels and Skype chatrooms as you like. Skype chatrooms are defined by the blob, which you can obtain writing `/get uri` in a chatroom.
 
 You may need to join your Skype chatroom to be mirrored before actually starting the gateway, because it seems that Skype API isn't always able to successfully join the chatroom using a blob provided (I usually get a timeout error). So make sure you have an access to chatroom using GUI before starting to hassle with the code.
 
-The default values provided in the header of `skype2irc.py` should be enough to give the program a test run.
+The default values provided should be enough to give the program a test run.
 
-If you want to use an option to save broadcast states for IRC users, working directory for the script has to be writable.
+If you want to use an option to save broadcast states for IRC users, the working directory for the script has to be writable.
 
 RUN
 --- 
