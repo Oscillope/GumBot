@@ -28,6 +28,7 @@
 import sys, signal
 import time, datetime
 import string, textwrap
+import json
 
 from ircbot import SingleServerIRCBot
 from irclib import ServerNotConnectedError
@@ -35,22 +36,19 @@ from threading import Timer
 
 version = "0.22"
 
-servers = [
-("irc.someserver.net", 6667),
-]
+# Read in from config file
+configfile = open("config.json")
+config = json.load(configfile)
 
-nick = "GumBot"
-botname = "IRC ⟷  Skype Bot, codename GumBot".decode('UTF-8')
-password = None
+# servers = [(x[0], x[1]) for x in config['servers']]
+servers = config['servers']
 
-mirrors = {
-'#pfc':
-'zx3SYBCX3Z3baXam0vsl9YDK8lYwBHNg9BtNoKW0GiILYibzfakNbW7hhbKyuwZtvFAKQbtrdp1YyXHmW-D0fm_4kw98nHW9Hu_r5h38R8JLLq_DrbT0W5O5d3Uf9nQlv0OLqlcPYpMzfc0Z7xDoUoE1yNCzFtDunqkbzOX0mGY-4ja9Cx_QXSgQGcYuhEw6cERQWyIVwQyjJ9fEg2s',
-'#drawncon-staff':
-'ySZLaBWTR_GxJ17cQAzOC7xZNVpedV09ycTm4jERs9GcZbL6MOPqqITnVUfdxRwEm2AykF86dRFwQS72KyKJdPmNDWf684Z0mYslSTYyH1DK-QwiI_5oTzA_ez1gmEpLHIZ0cFyx25DjnVhyvl1jDN2W1SGPrpIrAEHKXETKMhK__P2mrndwBaKC0lSp4Fbic74KdKVO5Z0Qezk0e56dDw',
-'#funderdome':
-'Yddl89U8KYP2qcW8pY6jKy13yOwloLEJlmXcLKKV9DHS6Vj2ITE_UV74aLFAwL1DFu160YGZCpxHYur6yi76UHYLHEmNT5T_iL8GBzMAAxGBu9oiAlbr_LLwn0QNjwSYekb6hab3Jf0iZ4hw_fLoj9O_zVafZOP1N8zHuSpg6Bs',
-}
+nick = config['nick']
+botname = config['botname'].decode("UTF-8")
+password = config['password']
+
+# {'#bronycon-registration': "skype:?chat&blob=DtK3LJ0-oziuQwXQaRQkMVAX2iNryb1VWY7kZAKjAOHRUgR_uFE3GEIncztciVRYGVRXEnEpGtqiS35jsld-cswmTP_RXyPEnsU0XLjwMLOKwcFjTJ1RNMcduvhlnFRlvUMZzr1HVH9gw45lfN0omAsoNOfwnvkgOIc1Ilh8Pcc6vc9TPrLy-QwAFvqdrNHqW6tpInYUpOMxaAS55L-JfKuOGbKbps3HVGU5MKBPFSIM"}
+mirrors = config['mirrors']
 
 max_irc_msg_len = 442
 ping_interval = 2*60

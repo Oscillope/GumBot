@@ -1,0 +1,9 @@
+{
+	"servers": [["irc.somenetwork.net", 6667]],
+	"nick": "GumBot",
+	"botname": "IRC <-> Skype Bot",
+	"password": "",
+	"mirrors": {
+		"#channel1": "blob"
+	}
+}
