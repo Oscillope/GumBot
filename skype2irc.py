@@ -177,9 +177,9 @@ def OnMessageStatus(Message, Status):
     if chat in usemap:
         if Status == 'RECEIVED':
             if msgtype == 'EMOTED':
-                bot.say(usemap[chat], emote_char + " " + senderHandle + " " + raw)
+                bot.say(usemap[chat], emote_char + " " + senderDisplay + " " + raw)
             elif msgtype == 'SAID':
-                bot.say(usemap[chat], name_start + senderHandle + name_end + " " + raw)
+                bot.say(usemap[chat], name_start + senderDisplay + name_end + " " + raw)
 
 def decode_irc(raw, preferred_encs = preferred_encodings):
     """Heuristic IRC charset decoder"""
