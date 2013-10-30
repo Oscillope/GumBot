@@ -302,7 +302,7 @@ class MirrorBot(SingleServerIRCBot):
                     mutedl[target].append(source)
                     save_mutes(target)
             return
-        if source in mutedl[target]:
+        if not mutedl.has_key(target) or source in mutedl[target]:
             return
         msg = name_start + source + name_end + " "
         for raw in args:
