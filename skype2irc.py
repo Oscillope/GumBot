@@ -281,6 +281,8 @@ class MirrorBot(SingleServerIRCBot):
 	if vhost:
 	    bot.say("HostServ", "ON")
         time.sleep(1)
+	# ensure handler is present exactly once by removing it before adding
+	self.connection.remove_global_handler("ctcp", self.handle_ctcp)
 	self.connection.add_global_handler("ctcp", self.handle_ctcp)
         for pair in mirrors:
             connection.join(pair)
