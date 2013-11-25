@@ -34,6 +34,13 @@ from ircbot import SingleServerIRCBot
 from irclib import ServerNotConnectedError
 from threading import Timer
 
+import importlib
+import logging
+
+logging.basicConfig(level=logging.WARN,
+                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S')
+
 version = "0.22"
 
 # Read in from config file
@@ -48,6 +55,8 @@ password = config['password']
 vhost = config['vhost']
 
 mirrors = config['mirrors']
+
+modconfig = config['modules']
 
 max_irc_msg_len = 442
 ping_interval = 2*60
@@ -180,6 +189,8 @@ def OnMessageStatus(Message, Status):
                 bot.say(usemap[chat], emote_char + " " + senderDisplay.encode('ascii', 'ignore') + " " + raw.encode('ascii', 'ignore'))
             elif msgtype == 'SAID':
                 bot.say(usemap[chat], name_start + senderDisplay.encode('ascii', 'ignore') + name_end + " " + raw.encode('ascii', 'ignore'))
+                for modname in modules:
+                    modules[modname].skype_msg(senderHandle, senderDisplay, chat, raw)
 
 def decode_irc(raw, preferred_encs = preferred_encodings):
     """Heuristic IRC charset decoder"""
@@ -218,7 +229,7 @@ class MirrorBot(SingleServerIRCBot):
     """Create IRC bot class"""
 
     def __init__(self):
-        SingleServerIRCBot.__init__(self, servers, nick, (botname + " " + topics).encode("UTF-8"), reconnect_interval)
+        SingleServerIRCBot.__init__(self, servers, nick, (botname).encode("UTF-8"), reconnect_interval)
 
     def start(self):
         """Override default start function to avoid starting/stalling the bot with no connection"""
@@ -268,7 +279,7 @@ class MirrorBot(SingleServerIRCBot):
                         time.sleep(delay_btw_seqs) # to avoid flood excess
         except ServerNotConnectedError:
             print "{" +target + " " + msg+"} SKIPPED!"
-			
+            
     def notice(self, target, msg):
         """Send notices to channels/nicks"""
         self.say(self, target, msg, False)
@@ -278,12 +289,12 @@ class MirrorBot(SingleServerIRCBot):
         print "Connected to", self.connection.get_server_name()
         if password is not None:
             bot.say("NickServ", "identify " + password)
-	if vhost:
-	    bot.say("HostServ", "ON")
-        time.sleep(1)
-	# ensure handler is present exactly once by removing it before adding
-	self.connection.remove_global_handler("ctcp", self.handle_ctcp)
-	self.connection.add_global_handler("ctcp", self.handle_ctcp)
+        if vhost:
+            bot.say("HostServ", "ON")
+            time.sleep(1)
+        # ensure handler is present exactly once by removing it before adding
+        self.connection.remove_global_handler("ctcp", self.handle_ctcp)
+        self.connection.add_global_handler("ctcp", self.handle_ctcp)
         for pair in mirrors:
             connection.join(pair)
             print "Joined " + pair
@@ -306,12 +317,15 @@ class MirrorBot(SingleServerIRCBot):
             return
         if not mutedl.has_key(target) or source in mutedl[target]:
             return
-        msg = name_start + source + name_end + " "
+        msg_hdr = name_start + source + name_end + " "
+        msg_body = ''
         for raw in args:
-            msg += decode_irc(raw) + "\n"
-        msg = msg.rstrip("\n")
-        print cut_title(usemap[target].FriendlyName), msg
-        usemap[target].SendMessage(msg)
+            msg_body += decode_irc(raw) + "\n"
+        msg_body = msg_body.rstrip("\n")
+        print cut_title(usemap[target].FriendlyName), msg_hdr + msg_body
+        usemap[target].SendMessage(msg_hdr + msg_body)
+        for modname in modules:
+            modules[modname].irc_msg(source, target, msg_body)
 
     def handle_ctcp(self, connection, event):
         """Handle CTCP events for emoting"""
@@ -440,5 +454,23 @@ topics = topics.rstrip("|") + "]"
 load_mutes()
 
 bot = MirrorBot()
+
+# module API:
+# main module sets config, usemap, and irc_say
+# on Skype msg, main module calls module.skype_msg(senderDisplay, senderHandle, chat, msg)
+# on IRC msg, main module calls module.irc_msg(source, target, msg)
+
+modules = {}
+for modname in modconfig:
+    try:
+        module = importlib.import_module(modname)
+        module.config = modconfig[modname]
+        module.usemap = usemap
+        module.ircbot = bot
+        modules[modname] = module
+        logging.info('Loaded module %s' % modname)
+    except:
+        logging.error('Failed to load module %s!' % modname)
+
 print "Starting IRC bot..."
 bot.start()

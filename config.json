@@ -6,5 +6,8 @@
 	"vhost": false,
 	"mirrors": {
 		"#channel1": "blob"
-	}
+	},
+    "modules": {
+        "example": {}
+    }
 }
