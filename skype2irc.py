@@ -34,6 +34,8 @@ from ircbot import SingleServerIRCBot
 from irclib import ServerNotConnectedError
 from threading import Timer
 
+from config import config
+
 import importlib
 import logging
 
@@ -42,10 +44,6 @@ logging.basicConfig(level=logging.WARN,
                     datefmt='%Y-%m-%d %H:%M:%S')
 
 version = "0.22"
-
-# Read in from config file
-configfile = open("config.json")
-config = json.load(configfile)
 
 servers = config['servers']
 

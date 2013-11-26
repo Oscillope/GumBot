@@ -50,24 +50,22 @@ def encode_utf8_to_iso88591(utf8_text):
     # Replace/clobber any remaining UTF-8 characters that aren't in ISO-8859-1
     return utf8_text.encode('ISO-8859-1', 'replace')
 
+def get_quote():
+    try:
+        r = requests.get(config['url'], auth=(config['http-user'], config['http-pass']), timeout=3)
+        if r.status_code != 200:
+            raise Exception()
+        quote = encode_utf8_to_iso88591(r.content)
+        return quote
+    except Exception, e:
+        return 'error getting quote :( (%s)' % e
+
 def irc_msg(source, target, msg):
-    if msg == '!quote':
-        r = requests.get(config['url'], auth=(config['http-user'], config['http-pass']))
-        if r.status_code == 200:
-            quote = encode_utf8_to_iso88591(r.text)
-            ircbot.say(target, quote)
-            usemap[target].SendMessage(quote)
-        else:
-            ircbot.say(target, 'error getting quote :(')
-            usemap[target].SendMessage('error getting quote :(')
+    if msg == '!quote' and target in config['channels']:
+        ircbot.say(target, get_quote())
+        usemap[target].SendMessage(get_quote())
 
 def skype_msg(sourceDisplay, sourceHandle, target, msg):
-    if msg == '!quote':
-        r = requests.get(config['url'], auth=(config['http-user'], config['http-pass']))
-        if r.status_code == 200:
-            quote = encode_utf8_to_iso88591(r.text)
-            ircbot.say(usemap[target], quote)
-            target.SendMessage(quote)
-        else:
-            ircbot.say(usemap[target], 'error getting quote :(')
-            target.SendMessage('error getting quote :(')
+    if msg == '!quote' and usemap[target] in config['channels']:
+        ircbot.say(usemap[target], get_quote())
+        target.SendMessage(get_quote())
