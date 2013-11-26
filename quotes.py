@@ -6,6 +6,7 @@
 
 import requests
 import re
+import traceback
 
 def encode_utf8_to_iso88591(utf8_text):
     # Borrowed from http://jamesmurty.com/2011/12/30/python-code-utf8-to-latin1/
@@ -31,11 +32,11 @@ def encode_utf8_to_iso88591(utf8_text):
         return utf8_text
     # Replace "smart" and other single-quote like things
     utf8_text = re.sub(
-        u'[\u02bc\u2018\u2019\u201a\u201b\u2039\u203a\u300c\u300d]',
+        u'[\u02bc\u2018\u2019\u201a\u201b\u2039\u203a\u300c\u300d\x91\x92]',
         "'", utf8_text)
     # Replace "smart" and other double-quote like things
     utf8_text = re.sub(
-        u'[\u00ab\u00bb\u201c\u201d\u201e\u201f\u300e\u300f]',
+        u'[\u00ab\u00bb\u201c\u201d\u201e\u201f\u300e\u300f\x93\x94]',
         '"', utf8_text)
     # Replace copyright symbol
     utf8_text = re.sub(u'[\u00a9\u24b8\u24d2]', '(c)', utf8_text)
@@ -55,17 +56,21 @@ def get_quote():
         r = requests.get(config['url'], auth=(config['http-user'], config['http-pass']), timeout=3)
         if r.status_code != 200:
             raise Exception()
-        quote = encode_utf8_to_iso88591(r.content)
+        # FUCK CHARACTER ENCODINGS.
+        quote = encode_utf8_to_iso88591(r.content.decode('ISO-8859-1'))
         return quote
     except Exception, e:
+        traceback.print_exc()
         return 'error getting quote :( (%s)' % e
 
 def irc_msg(source, target, msg):
     if msg == '!quote' and target in config['channels']:
-        ircbot.say(target, get_quote())
-        usemap[target].SendMessage(get_quote())
+        quote = get_quote()
+        ircbot.say(target, quote)
+        usemap[target].SendMessage(quote)
 
 def skype_msg(sourceDisplay, sourceHandle, target, msg):
     if msg == '!quote' and usemap[target] in config['channels']:
-        ircbot.say(usemap[target], get_quote())
-        target.SendMessage(get_quote())
+        quote = get_quote()
+        ircbot.say(usemap[target], quote)
+        target.SendMessage(quote)
