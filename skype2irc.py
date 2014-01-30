@@ -73,8 +73,6 @@ emote_char = "*".decode('UTF-8') # "*"
 
 muted_list_filename = nick + '.%s.muted'
 
-topics = ""
-
 usemap = {}
 bot = None
 mutedl = {}
@@ -333,7 +331,7 @@ class MirrorBot(SingleServerIRCBot):
         if target in mirrors.keys():
             if source in mutedl[target]:
                 return
-        if args[0]=='ACTION' and len(args) == 2:
+        if args[0]=='ACTION' and len(args) == 2 and target in usemap:
             # An emote/action message has been sent to us
             msg = emote_char + " " + source + " " + decode_irc(args[1]) + "\n"
             print cut_title(usemap[target].FriendlyName), msg
@@ -402,7 +400,7 @@ class MirrorBot(SingleServerIRCBot):
             bot.say(source, msg)
             
         elif two in ('?', 'HE', 'HI', 'WT'): # HELP
-            bot.say(source, botname + " " + version + " " + topics + "\n * ON/OFF/STATUS --- Trigger mirroring to Skype\n * INFO #channel --- Display list of users from relevant Skype chat\nDetails: https://github.com/boamaod/skype2irc#readme")
+            bot.say(source, botname + " " + version + " " + "\n * ON/OFF/STATUS --- Trigger mirroring to Skype\n * INFO #channel --- Display list of users from relevant Skype chat\nDetails: https://github.com/boamaod/skype2irc#readme")
 
 # *** Start everything up! ***
 
@@ -439,15 +437,12 @@ except:
 
 print 'Skype API initialised.'
 
-topics = "["
 for pair in mirrors:
     chat = skype.CreateChatUsingBlob(mirrors[pair])
     topic = chat.FriendlyName
     print "Joined \"" + topic + "\""
-    topics += cut_title(topic) + "|"
     usemap[pair] = chat
     usemap[chat] = pair
-topics = topics.rstrip("|") + "]"
 
 load_mutes()
 
