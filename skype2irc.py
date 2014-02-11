@@ -302,7 +302,7 @@ class MirrorBot(SingleServerIRCBot):
         source = event.source().split('!')[0]
         target = event.target().lower()
         cmds = args[0].split()
-        if cmds[0].rstrip(":,") == nick:
+        if cmds and cmds[0].rstrip(":,") == nick:
             if len(cmds)==2:
                 if cmds[1].upper() == 'ON' and source in mutedl[target]:
                     mutedl[target].remove(source)
@@ -342,6 +342,8 @@ class MirrorBot(SingleServerIRCBot):
         source = event.source().split('!')[0]
         raw = event.arguments()[0].decode('utf-8', 'ignore')
         args = raw.split()
+        if not args:
+            return
         two = args[0][:2].upper()
         
         if two == 'ST': # STATUS
