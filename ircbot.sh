@@ -6,8 +6,8 @@ while :
 do
 
    date --rfc-3339=seconds | sed -r -e "s/(.*)/\1 STARTED/"
-   DISPLAY="host:0.0" python skype2irc.py
+   DISPLAY=":0" python2 skype2irc.py
    date --rfc-3339=seconds | sed -r -e "s/(.*)/\1 STOPPED/"
-   sleep 30
+   sleep 10
 
 done

@@ -1,0 +1,9 @@
+import sqlite3
+
+from intf_auth import IAuthenticator
+
+usemap=None
+config=None
+ircbot=None
+
+class Authenticator(IAuthenticator)

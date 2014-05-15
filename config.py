@@ -1,16 +1,18 @@
 # GumBot config file
 
 config = {
-	"servers": [("127.0.0.1", 6667)],
-	"nick": "GumBot",
-	"botname": "IRC <-> Skype Bot",
-	"password": "",
+	"servers": [("irc.IRCHighway.net", 6667)],
+	"nick": "RoBot",
+	"botname": "RoBot",
+	"password": "robotnik",
 	"vhost": False,
 	"mirrors": {
-        "#example": "blob"
+		"#channel": "blob"
 	},
-    "modules": {
+	"modules": {
 #        "example": {},
 #        "quotes": {"url": "", "http-user": "", "http-pass": "", "channels": ["#example"]},
-    }
+		"inject": {"path": {"inject": "./run/inject", "inspect": "./run/inspect"}, "wait": {"initial": 10, "update": 10}},
+		"spikebot": {},
+	}
 }

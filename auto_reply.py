@@ -15,21 +15,21 @@ my_exp = re.compile('')
 my_response = ''
 
 def message_scan(source, msg):
-    msg = msg.strip()
-    ismatch = my_exp.match(msg)
-    if ismatch: 
-    	return source + ": " + my_response
+	msg = msg.strip()
+	ismatch = my_exp.match(msg)
+	if ismatch: 
+		return source + ": " + my_response
 
 def irc_msg(source, target, msg):
-    if not target in config['channels']:
-        return
-    scanner = message_scan(source, msg)
-    if scanner and target in config['channels']:
-        ircbot.say(target, scanner)
-        usemap[target].SendMessage(scanner)
+	if not target in config['channels']:
+		return
+	scanner = message_scan(source, msg)
+	if scanner and target in config['channels']:
+		ircbot.say(target, scanner)
+		usemap[target].SendMessage(scanner)
 
 def skype_msg(sourceDisplay, sourceHandle, target, msg):
-    scanner = message_scan(sourceDisplay, msg)
-    if scanner and usemap[target] in config['channels']:
-        ircbot.say(usemap[target], scanner)
-        target.SendMessage(scanner)
+	scanner = message_scan(sourceDisplay, msg)
+	if scanner and usemap[target] in config['channels']:
+		ircbot.say(usemap[target], scanner)
+		target.SendMessage(scanner)
